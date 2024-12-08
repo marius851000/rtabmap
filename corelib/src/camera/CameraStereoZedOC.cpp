@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <rtabmap/utilite/UEventsManager.h>
 #include <rtabmap/utilite/UConversion.h>
 
+#include <charconv>
+
 #ifdef RTABMAP_ZEDOC
 #define VIDEO_MOD_AVAILABLE
 #define SENSORS_MOD_AVAILABLE
@@ -92,7 +94,12 @@ public:
             std::vector<std::string> elems;
             split(key, ':', elems);
 
-            return atof(ini_.GetValue(elems.front().c_str(), elems.back().c_str(), std::to_string(default_value).c_str()));
+			const char * result_unparsed = ini_.GetValue(elems.front().c_str(), elems.back().c_str(), std::to_string(default_value).c_str());
+
+			float result_parsed = -1.f;
+			std::from_chars(result_unparsed, result_unparsed + strlen(result_unparsed), result_parsed);
+
+			return (float) result_parsed;
         } else
             return -1.f;
     }
